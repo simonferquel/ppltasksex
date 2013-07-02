@@ -10,6 +10,7 @@ Additionaly, as the destruction of the object could happen concurrently with the
 
 The LifetimeChecker class help you do this in a simple way. The following code sample illustrate how to use it:
 
+```cpp
 class AsyncComponent{
 private:
 	ppltasksex::lifetime_checker _checker;
@@ -38,9 +39,10 @@ public:
 		}, localChecker.getCancelToken());
 	}
 };
+```
 
 
-2. whileAsync
+1. whileAsync
 
 whileAsync reproduces the "while" loop flow with the differnce that the body is asynchronous.
 whileAsync takes 2 arguments and returns a task<void> completing when the condition returns false:
@@ -50,6 +52,7 @@ whileAsync takes 2 arguments and returns a task<void> completing when the condit
 If you use the lifetime_checker with whileAsync, you need to pay attention that the first execution of "condition" will not occur in the context of a task (if whileAsync is called outside of task), and so you should not call "acquireOrCancel" in it.
 However, this condition works well:
 
+```cpp
 [this, localChecker](){
 	auto guard = localChecker.acquire();
 	if(localChecker.getCancelToken().is_canceled()){
@@ -57,39 +60,42 @@ However, this condition works well:
 	}
 	// real condition
 }
+```
 
 Additionaly, only checking the lifetime_checker in the condition is not enough. You should check it inside the body as well (because living the condition releases the lifetime_checker mutex)
 
-3. forAsync
+1. forAsync
 
 forAsync reproduces the "for" loop flow with an asynchronous body:
 
+```cpp
 ppltasksex::forAsync<int>(0, 5, [&result](const int& v){
-				return concurrency::create_task([v]{
-					...
-				});
-			});
+	return concurrency::create_task([v]{
+		...
+	});
+});
+```
 
 it returns a task<void> that completes when the async loop has ended
 
 remark: each occurence of the body is executed after the previous one completes
 
-4. foreachAsync
+1. foreachAsync
 
 foreachAsync works like std::foreach, except that the body is asynchronous (each occurence of the body is executed after the previous one completes)
 
-			std::vector<int> v;
-			v.push_back(0);
-			v.push_back(1);
-			v.push_back(2);
-			v.push_back(3);
-			v.push_back(4);
-
-			int result = 0;
+```cpp
+std::vector<int> v;
+v.push_back(0);
+v.push_back(1);
+v.push_back(2);
+v.push_back(3);
+v.push_back(4);
 			
-			ppltasksex::foreachAsync(v.begin(), v.end(),
-				[](const int& val){
-					return concurrency::create_task([val]{
-						...
-					});
-			});
+ppltasksex::foreachAsync(v.begin(), v.end(),
+	[](const int& val){
+		return concurrency::create_task([val]{
+			...
+		});
+	});
+```
