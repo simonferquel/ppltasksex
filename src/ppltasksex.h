@@ -9,11 +9,11 @@ namespace ppltasksex{
 
 	class movable_lockguard{
 	private:
-		std::mutex* _pMutex;
+		std::recursive_mutex* _pMutex;
 		// uncopyable:
 		movable_lockguard(const movable_lockguard& noncopied){}
 	public:
-		movable_lockguard(std::mutex* pMutex):_pMutex(pMutex){
+		movable_lockguard(std::recursive_mutex* pMutex):_pMutex(pMutex){
 			if(_pMutex){
 				_pMutex->lock();
 			}
@@ -33,7 +33,7 @@ namespace ppltasksex{
 
 	class lifetime_checker{
 	private:
-		std::shared_ptr<std::mutex> _mutex;
+		std::shared_ptr<std::recursive_mutex> _mutex;
 		concurrency::cancellation_token_source _cts;
 
 		// non movable
@@ -44,7 +44,7 @@ namespace ppltasksex{
 
 	public:
 		lifetime_checker() : 
-			_mutex(new std::mutex()), 
+			_mutex(new std::recursive_mutex()), 
 			_cts(){
 		}
 		lifetime_checker(const lifetime_checker& copied):
