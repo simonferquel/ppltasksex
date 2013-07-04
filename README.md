@@ -3,7 +3,7 @@ ppltasksex
 
 Helper collection to help correct usage of ppl tasks
 
-1. LifetimeChecker
+## LifetimeChecker
 
 When you create a task continuation in a member function that captures the "this" pointer, you need to check if the object is still living before accessing its state.
 Additionaly, as the destruction of the object could happen concurrently with the task continuation, you need to do a bit of synchronization between your task continuations and the destructor.
@@ -42,7 +42,7 @@ public:
 ```
 
 
-1. whileAsync
+## whileAsync
 
 whileAsync reproduces the "while" loop flow with the differnce that the body is asynchronous.
 whileAsync takes 2 arguments and returns a task<void> completing when the condition returns false:
@@ -64,7 +64,7 @@ However, this condition works well:
 
 Additionaly, only checking the lifetime_checker in the condition is not enough. You should check it inside the body as well (because living the condition releases the lifetime_checker mutex)
 
-1. forAsync
+## forAsync
 
 forAsync reproduces the "for" loop flow with an asynchronous body:
 
@@ -80,7 +80,7 @@ it returns a task<void> that completes when the async loop has ended
 
 remark: each occurence of the body is executed after the previous one completes
 
-1. foreachAsync
+## foreachAsync
 
 foreachAsync works like std::foreach, except that the body is asynchronous (each occurence of the body is executed after the previous one completes)
 
