@@ -1,3 +1,4 @@
+#pragma once
 #include <ppltasks.h>
 #include <memory>
 #include <mutex>
