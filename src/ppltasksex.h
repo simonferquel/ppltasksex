@@ -74,11 +74,14 @@ namespace ppltasksex{
 
 	inline concurrency::task<void> whileAsync(
 		std::function<bool(void)> condition, 
-		std::function<concurrency::task<void>(void)> body){
-			static concurrency::task<void> s_voidTaskCached ([]{});
+		std::function<concurrency::task<void>(void)> body, DWORD millisecondsBetweenRetries = 0){
+			static concurrency::task<void> s_voidTaskCached([]{});
 			if(condition()){
-				return body().then([condition, body](){
-					return whileAsync(condition, body);
+				return body().then([condition, body, millisecondsBetweenRetries](){
+					if (millisecondsBetweenRetries > 0){
+						WaitForSingleObjectEx(GetCurrentThread(), millisecondsBetweenRetries, FALSE);
+					}
+					return whileAsync(condition, body, millisecondsBetweenRetries);
 				});
 			} else {
 				return s_voidTaskCached;
